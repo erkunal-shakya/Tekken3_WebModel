@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tekken 3 – Character Select</title>
+  <style>
+    body {
+      background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)),
+                  url('https://yattatachi.com/wp-content/uploads/2015/12/Tekken-3-Feature.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #ccc;
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px 30px;
+      border: 4px solid #303030;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 10px 0 20px;
+      color: #fff;
+      font-size: 24px;
+    }
+
+    #top-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .player-panel {
+      width: 40%;
+      text-align: center;
+    }
+
+    .player-panel img {
+      width: 180px;
+      height: 220px;
+      background: #333;
+      object-fit: cover;
+      border: 2px solid #444;
+    }
+
+    .player-name {
+      font-size: 20px;
+      margin-top: 10px;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    #free-play {
+      position: absolute;
+      top: 0;
+      right: 85px;
+      font-size: 20px;
+      color: cyan;
+      font-weight: bold;
+    }
+
+    #grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      background-color: #1a1a1a;
+      padding: 10px;
+      border-top: 2px solid #333;
+    }
+
+    .char {
+      width: 80px;
+      text-align: center;
+      margin: 6px;
+      position: relative;
+    }
+
+    .char img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border: 2px solid #1a1a1a;
+    }
+
+    .char.selected img {
+      border-color: red;
+    }
+
+    .char-name {
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    .tag-1p {
+      position: absolute;
+      bottom: 6px;
+      left: 6px;
+      background: red;
+      color: white;
+      font-size: 10px;
+      padding: 1px 3px;
+      font-weight: bold;
+    }
+
+    #countdown-timer {
+      font-family: monospace;
+      font-size: 50px;
+      font-weight: bold;
+      color: yellow;
+      text-align: center;
+      width: 80px;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Tekken 3 – Character Select</h1>
+
+  <div id="top-section">
+    <div class="player-panel">
+      <img id="p1" src="img/thumbs/random.png" alt="?">
+      <div id="p1-name" class="player-name">PLAYER 1</div>
+    </div>
+
+    <!-- ✅ ADDED: Countdown timer display -->
+    <div id="countdown-timer">60</div>
+
+    <div class="player-panel">
+      <div id="free-play">FREE PLAY</div>
+      <img id="p2" src="img/thumbs/random.png" alt="">
+      <div id="p2-name" class="player-name">PLAYER 2</div>
+    </div>
+  </div>
+
+  <div id="grid"></div>
+</div>
+
+<!-- ✅ ADDED: Sound elements -->
+<audio id="selectSound" src="sounds/SelectPlayerSound.mp3"></audio>
+<audio id="enterSound" src="sounds/EnterSound.mp3"></audio>
+<audio id="bgMusic" src="sounds/BackroundMusic01.mp3" autoplay loop></audio>
+<audio id="timeUpSound" src="sounds/TimeUpSound.mp3"></audio>
+
+<script>
+  const chars = [
+    'Jin', 'Paul', 'Law', 'Lee', 'Hwoarang', 'Nina', 'Yoshimitsu',
+    'King', 'Xiaoyu', 'Eddy', 'Bryan', 'Heihachi', 'Julia',
+    'Kuma', 'GunJack', 'Mokujin', 'DrBoskonovitch', 'Anna', 'Gon', 'Ogre', 'TrueOgre'
+  ].map(name => ({
+    name,
+    thumb: `img/thumbs/${name}.png`,
+    full: `img/thumbs/${name}.png`
+  }));
+
+  const grid = document.getElementById('grid');
+  const p1 = document.getElementById('p1');
+  const p1Name = document.getElementById('p1-name');
+  const selectSound = document.getElementById('selectSound');
+  const enterSound = document.getElementById('enterSound');
+  const bgMusic = document.getElementById('bgMusic');
+  const timeUpSound = document.getElementById('timeUpSound');
+  const timerDisplay = document.getElementById('countdown-timer');
+
+  let idx = 0;
+
+  function drawGrid() {
+    grid.innerHTML = '';
+    chars.forEach((c, i) => {
+      const d = document.createElement('div');
+      d.className = 'char' + (i === idx ? ' selected' : '');
+      d.innerHTML = `
+        <img src="${c.thumb}" alt="${c.name}">
+        <div class="char-name">${c.name}</div>
+        ${i === idx ? '<div class="tag-1p">1P</div>' : ''}
+      `;
+      d.onclick = () => {
+        select(i);
+        playEnterSound(); // ✅ ADDED: play enter sound on click
+      };
+      grid.appendChild(d);
+    });
+  }
+
+  function playSelectSound() {
+    selectSound.currentTime = 0;
+    selectSound.play();
+  }
+
+  function playEnterSound() {
+    enterSound.currentTime = 0;
+    enterSound.play();
+  }
+
+  function select(i) {
+    idx = i;
+    drawGrid();
+    p1.src = chars[i].full;
+    p1Name.textContent = chars[i].name;
+  }
+
+  document.addEventListener('keydown', e => {
+    const cols = 6;
+    const oldIndex = idx;
+    if (e.key === 'ArrowRight') idx = (idx + 1) % chars.length;
+    if (e.key === 'ArrowLeft') idx = (idx - 1 + chars.length) % chars.length;
+    if (e.key === 'ArrowDown') idx = (idx + cols) % chars.length;
+    if (e.key === 'ArrowUp') idx = (idx - cols + chars.length) % chars.length;
+    if (idx !== oldIndex) {
+      drawGrid();
+      playSelectSound();
+    }
+    if (e.key === 'Enter') {
+      select(idx);
+      playEnterSound();
+    }
+  });
+
+  // ✅ ADDED: Ensure background music plays after user interaction
+  bgMusic.volume = 0.4;
+  bgMusic.play().catch(() => {
+    document.addEventListener('click', () => bgMusic.play(), { once: true });
+  });
+
+  // ✅ ADDED: 60-second countdown logic
+  let timeLeft = 60;
+  function startCountdown() {
+    const countdown = setInterval(() => {
+      timeLeft--;
+      timerDisplay.textContent = timeLeft;
+
+      if (timeLeft <= 0) {
+        clearInterval(countdown);
+        timerDisplay.textContent = "0";
+        timeUpSound.play(); // ✅ Play time up sound
+      }
+    }, 1000);
+  }
+
+  startCountdown(); // ✅ Start the countdown on page load
+
+  drawGrid();
+</script>
+
+</body>
+</html>
