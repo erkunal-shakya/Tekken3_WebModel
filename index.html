@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Tekken 3 – Character Select</title>
+  <title>Tekken 3 – Character Select Model</title>
   <style>
     body {
       background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)),
@@ -132,7 +132,7 @@
       <div id="p1-name" class="player-name">PLAYER 1</div>
     </div>
 
-    <!-- ✅ ADDED: Countdown timer display -->
+    <!--Countdown timer display -->
     <div id="countdown-timer">60</div>
 
     <div class="player-panel">
@@ -145,7 +145,7 @@
   <div id="grid"></div>
 </div>
 
-<!-- ✅ ADDED: Sound elements -->
+<!--Sound elements -->
 <audio id="selectSound" src="sounds/SelectPlayerSound.mp3"></audio>
 <audio id="enterSound" src="sounds/EnterSound.mp3"></audio>
 <audio id="bgMusic" src="sounds/BackroundMusic01.mp3" autoplay loop></audio>
@@ -185,7 +185,7 @@
       `;
       d.onclick = () => {
         select(i);
-        playEnterSound(); // ✅ ADDED: play enter sound on click
+        playEnterSound(); // play enter sound on click
       };
       grid.appendChild(d);
     });
@@ -225,13 +225,13 @@
     }
   });
 
-  // ✅ ADDED: Ensure background music plays after user interaction
+  //background music play always
   bgMusic.volume = 0.4;
   bgMusic.play().catch(() => {
     document.addEventListener('click', () => bgMusic.play(), { once: true });
   });
 
-  // ✅ ADDED: 60-second countdown logic
+  // 60-second countdown logic
   let timeLeft = 60;
   function startCountdown() {
     const countdown = setInterval(() => {
@@ -241,7 +241,7 @@
       if (timeLeft <= 0) {
         clearInterval(countdown);
         timerDisplay.textContent = "0";
-        timeUpSound.play(); // ✅ Play time up sound
+        timeUpSound.play(); //Play time up sound
       }
     }, 1000);
   }
